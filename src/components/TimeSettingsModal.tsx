@@ -134,21 +134,37 @@ export const TimeSettingsModal: React.FC<TimeSettingsModalProps> = ({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] text-slate-400 mb-1">Mulai Tidur:</label>
+                <label className="text-[11px] font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                  <span>Mulai Tidur:</span>
+                  <Clock className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                </label>
                 <input
                   type="time"
                   value={sleepStart}
                   onChange={(e) => setSleepStart(e.target.value)}
-                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-teal-500"
+                  onClick={(e) => {
+                    try {
+                      e.currentTarget.showPicker();
+                    } catch (err) {}
+                  }}
+                  className="w-full cursor-pointer text-xs font-medium bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-teal-500 transition-colors [color-scheme:dark]"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-400 mb-1">Bangun Pagi:</label>
+                <label className="text-[11px] font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                  <span>Bangun Pagi:</span>
+                  <Clock className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                </label>
                 <input
                   type="time"
                   value={sleepEnd}
                   onChange={(e) => setSleepEnd(e.target.value)}
-                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-teal-500"
+                  onClick={(e) => {
+                    try {
+                      e.currentTarget.showPicker();
+                    } catch (err) {}
+                  }}
+                  className="w-full cursor-pointer text-xs font-medium bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-teal-500 transition-colors [color-scheme:dark]"
                 />
               </div>
             </div>
@@ -162,21 +178,37 @@ export const TimeSettingsModal: React.FC<TimeSettingsModalProps> = ({
             </div>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <label className="block text-[11px] text-slate-400 mb-1">Masuk Kelas:</label>
+                <label className="text-[11px] font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                  <span>Masuk Kelas:</span>
+                  <Clock className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                </label>
                 <input
                   type="time"
                   value={schoolStart}
                   onChange={(e) => setSchoolStart(e.target.value)}
-                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-teal-500"
+                  onClick={(e) => {
+                    try {
+                      e.currentTarget.showPicker();
+                    } catch (err) {}
+                  }}
+                  className="w-full cursor-pointer text-xs font-medium bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-teal-500 transition-colors [color-scheme:dark]"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-400 mb-1">Pulang Sekolah:</label>
+                <label className="text-[11px] font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                  <span>Pulang Sekolah:</span>
+                  <Clock className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                </label>
                 <input
                   type="time"
                   value={schoolEnd}
                   onChange={(e) => setSchoolEnd(e.target.value)}
-                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-teal-500"
+                  onClick={(e) => {
+                    try {
+                      e.currentTarget.showPicker();
+                    } catch (err) {}
+                  }}
+                  className="w-full cursor-pointer text-xs font-medium bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-teal-500 transition-colors [color-scheme:dark]"
                 />
               </div>
             </div>
@@ -295,7 +327,12 @@ export const TimeSettingsModal: React.FC<TimeSettingsModalProps> = ({
                       type="time"
                       value={newRoutineStart}
                       onChange={(e) => setNewRoutineStart(e.target.value)}
-                      className="w-full text-xs bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-white"
+                      onClick={(e) => {
+                        try {
+                          e.currentTarget.showPicker();
+                        } catch (err) {}
+                      }}
+                      className="w-full cursor-pointer text-xs bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-white focus:outline-none focus:border-teal-500 [color-scheme:dark]"
                     />
                   </div>
                   <div>
@@ -304,7 +341,12 @@ export const TimeSettingsModal: React.FC<TimeSettingsModalProps> = ({
                       type="time"
                       value={newRoutineEnd}
                       onChange={(e) => setNewRoutineEnd(e.target.value)}
-                      className="w-full text-xs bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-white"
+                      onClick={(e) => {
+                        try {
+                          e.currentTarget.showPicker();
+                        } catch (err) {}
+                      }}
+                      className="w-full cursor-pointer text-xs bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-white focus:outline-none focus:border-teal-500 [color-scheme:dark]"
                     />
                   </div>
                 </div>

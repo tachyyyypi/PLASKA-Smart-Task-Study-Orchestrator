@@ -30,6 +30,7 @@ interface CardTimelineProps {
   onExpand?: () => void;
   onAddOneTimeEvent?: (event: OneTimeEvent) => void;
   onDeleteOneTimeEvent?: (id: string) => void;
+  onRescheduleTasks?: () => void;
 }
 
 export const CardTimeline: React.FC<CardTimelineProps> = ({
@@ -41,6 +42,7 @@ export const CardTimeline: React.FC<CardTimelineProps> = ({
   onExpand,
   onAddOneTimeEvent,
   onDeleteOneTimeEvent,
+  onRescheduleTasks,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const totalMinutes = 1440;
@@ -161,6 +163,9 @@ export const CardTimeline: React.FC<CardTimelineProps> = ({
 
   const handleRescheduleAction = () => {
     setIsReschedulingLocal(true);
+    if (onRescheduleTasks) {
+      onRescheduleTasks();
+    }
     setTimeout(() => {
       setIsReschedulingLocal(false);
       setDismissRescheduleBanner(true);
@@ -323,7 +328,7 @@ export const CardTimeline: React.FC<CardTimelineProps> = ({
               title="Tambah Jadwal Dadakan (One-Time Event)"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>+ Jadwal Dadakan</span>
+              <span>Jadwal Dadakan</span>
             </button>
           )}
 
@@ -654,7 +659,12 @@ export const CardTimeline: React.FC<CardTimelineProps> = ({
                   required
                   value={eventDate}
                   onChange={(e) => setEventDate(e.target.value)}
-                  className="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                  onClick={(e) => {
+                    try {
+                      e.currentTarget.showPicker();
+                    } catch (err) {}
+                  }}
+                  className="w-full cursor-pointer text-xs bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500 [color-scheme:dark]"
                 />
               </div>
 
@@ -666,7 +676,12 @@ export const CardTimeline: React.FC<CardTimelineProps> = ({
                     required
                     value={eventStart}
                     onChange={(e) => setEventStart(e.target.value)}
-                    className="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    onClick={(e) => {
+                      try {
+                        e.currentTarget.showPicker();
+                      } catch (err) {}
+                    }}
+                    className="w-full cursor-pointer text-xs bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500 [color-scheme:dark]"
                   />
                 </div>
                 <div>
@@ -676,7 +691,12 @@ export const CardTimeline: React.FC<CardTimelineProps> = ({
                     required
                     value={eventEnd}
                     onChange={(e) => setEventEnd(e.target.value)}
-                    className="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    onClick={(e) => {
+                      try {
+                        e.currentTarget.showPicker();
+                      } catch (err) {}
+                    }}
+                    className="w-full cursor-pointer text-xs bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500 [color-scheme:dark]"
                   />
                 </div>
               </div>

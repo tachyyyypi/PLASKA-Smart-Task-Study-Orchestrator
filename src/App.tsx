@@ -24,6 +24,7 @@ import {
 } from './types';
 import { calculateSchedule, getISODateOnly, sanitizeSubtaskAllocation, sanitizeAllTasksSchedule } from './utils/scheduler';
 import { runLocalDecomposition } from './utils/localDecomposition';
+import { decomposeTaskWithGemini } from './utils/geminiService';
 
 export default function App() {
   // Backend and environment status
@@ -111,103 +112,52 @@ export default function App() {
     message: string;
   } | null>(null);
 
-  // Initial load
+  // Initial load from LocalStorage
   useEffect(() => {
-    fetchStatus();
     fetchProfile();
     fetchTasks();
   }, []);
 
-  // Sync tasks and profile to localStorage for static hosting persistence
+  // Sync tasks and profile to localStorage unconditionally for 100% persistent storage
   useEffect(() => {
-    if (tasks.length > 0) {
-      try {
-        localStorage.setItem('plaska_tasks', JSON.stringify(tasks));
-      } catch (e) {}
-    }
+    try {
+      localStorage.setItem('plaska_tasks', JSON.stringify(tasks));
+    } catch (e) {}
   }, [tasks]);
 
   useEffect(() => {
-    if (userProfile.id || userProfile.name || userProfile.school_name) {
-      try {
-        localStorage.setItem('plaska_user_profile', JSON.stringify(userProfile));
-      } catch (e) {}
-    }
+    try {
+      localStorage.setItem('plaska_user_profile', JSON.stringify(userProfile));
+    } catch (e) {}
   }, [userProfile]);
 
-  // Safe JSON parser helper to prevent Unexpected token '<' HTML response crashes
-  const safeJson = async (res: Response) => {
-    const text = await res.text();
-    try {
-      return JSON.parse(text);
-    } catch (e) {
-      if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
-        throw new Error('Server mengembalikan halaman HTML (Error 404/500) alih-alih data JSON.');
-      }
-      throw new Error(`Invalid JSON response: ${text.substring(0, 100)}`);
-    }
-  };
-
-  const fetchStatus = async () => {
-    try {
-      const res = await fetch('/api/status');
-      const data = await safeJson(res);
-      if (data.success) {
-        setBackendStatus(data.firebase);
-        setGeminiKeyPresent(data.geminiKeyPresent);
-      }
-    } catch (err) {
-      console.warn('Status fetch failed:', err);
-    }
-  };
-
-  const fetchProfile = async () => {
-    try {
-      const res = await fetch('/api/user/profile');
-      const data = await safeJson(res);
-      if (data.success && data.profile) {
-        setUserProfile(data.profile);
-        setTasks((prevTasks) => sanitizeAllTasksSchedule(prevTasks, data.profile));
-        try {
-          localStorage.setItem('plaska_user_profile', JSON.stringify(data.profile));
-        } catch (e) {}
-        return;
-      }
-    } catch (err) {
-      console.warn('Profile fetch failed, trying localStorage:', err);
-    }
+  const fetchProfile = () => {
     const saved = localStorage.getItem('plaska_user_profile');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setUserProfile(parsed);
-        setTasks((prevTasks) => sanitizeAllTasksSchedule(prevTasks, parsed));
-      } catch (e) {}
+        if (parsed && typeof parsed === 'object') {
+          setUserProfile(parsed);
+          setTasks((prevTasks) => sanitizeAllTasksSchedule(prevTasks, parsed));
+        }
+      } catch (e) {
+        console.warn('Error parsing user profile from localStorage', e);
+      }
     }
   };
 
-  const fetchTasks = async () => {
-    try {
-      const res = await fetch('/api/tasks');
-      const data = await safeJson(res);
-      if (data.success && data.tasks) {
-        const sanitized = sanitizeAllTasksSchedule(data.tasks, userProfile);
-        setTasks(sanitized);
-        try {
-          localStorage.setItem('plaska_tasks', JSON.stringify(sanitized));
-        } catch (e) {}
-        return;
-      }
-    } catch (err) {
-      console.warn('Tasks fetch failed, trying localStorage:', err);
-    }
+  const fetchTasks = () => {
     const saved = localStorage.getItem('plaska_tasks');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        const sanitized = sanitizeAllTasksSchedule(parsed, userProfile);
-        setTasks(sanitized);
-      } catch (e) {}
+        if (Array.isArray(parsed)) {
+          const sanitized = sanitizeAllTasksSchedule(parsed, userProfile);
+          setTasks(sanitized);
+        }
+      } catch (e) {
+        console.warn('Error parsing tasks from localStorage', e);
+      }
     }
   };
 
@@ -216,7 +166,7 @@ export default function App() {
     return calculateSchedule(tasks, userProfile, selectedDate);
   }, [tasks, userProfile, selectedDate]);
 
-  // Handle Add Task with background decomposition UX (closes modal immediately, shows floating toast)
+  // Handle Add Task with Gemini AI & client-side decomposition UX
   const handleCreateTask = async (taskInput: {
     taskName: string;
     subject: string;
@@ -224,7 +174,7 @@ export default function App() {
     description: string;
     reference: string;
   }) => {
-    // 1. Immediately close modal / pop-up input without waiting for AI process
+    // 1. Immediately close modal / pop-up input
     setIsAddTaskModalOpen(false);
 
     // 2. Show floating toast banner in corner with task name context
@@ -235,53 +185,12 @@ export default function App() {
     });
 
     try {
-      let resultData: DecompositionResult | null = null;
-
-      try {
-        const res = await fetch('/api/decompose', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(taskInput),
-        });
-
-        const data = await safeJson(res);
-
-        if (res.ok && data.success && data.result) {
-          resultData = data.result;
-        }
-      } catch (e) {
-        console.warn('API decompose request failed or running static:', e);
-      }
-
-      if (!resultData) {
-        try {
-          const localRes = await fetch('/api/decompose/local', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(taskInput),
-          });
-          const localData = await safeJson(localRes);
-          if (localData.success && localData.result) {
-            resultData = localData.result;
-          }
-        } catch (e) {
-          console.warn('Local API decompose failed, executing browser client decomposition:', e);
-        }
-      }
-
-      // If backend API is not present (e.g. GitHub Pages static hosting), use browser local decomposition
-      if (!resultData) {
-        resultData = runLocalDecomposition(
-          taskInput.taskName,
-          taskInput.subject,
-          taskInput.description,
-          taskInput.deadline
-        );
-      }
+      // 1. Try Gemini API decomposition first, automatically falling back to Local Client Decomposition
+      const resultData = await decomposeTaskWithGemini(taskInput);
 
       await finalizeTaskCreation(taskInput, resultData);
 
-      // 4. Update toast to success with task name context
+      // Update toast to success
       setBackgroundToast({
         show: true,
         status: 'success',
@@ -346,36 +255,30 @@ export default function App() {
     setPendingTaskData(null);
   };
 
-  // User-Driven Fallback Action 2: Generate Ulang via AI
+  // User-Driven Fallback Action 2: Generate Ulang via Local Generator
   const handleRetryAiGeneration = async () => {
     if (!pendingTaskData) return;
     setIsRetryingAi(true);
 
     try {
-      const res = await fetch('/api/decompose', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(pendingTaskData),
-      });
+      const localData = runLocalDecomposition(
+        pendingTaskData.taskName,
+        pendingTaskData.subject,
+        pendingTaskData.description,
+        pendingTaskData.deadline
+      );
 
-      const data = await safeJson(res);
-
-      if (!res.ok || !data.success) {
-        setFallbackErrorMessage(data.error || 'Percobaan kedua ke Gemini API gagal.');
-        return;
-      }
-
-      await finalizeTaskCreation(pendingTaskData, data.result);
+      await finalizeTaskCreation(pendingTaskData, localData);
       setIsFallbackModalOpen(false);
       setPendingTaskData(null);
     } catch (err: any) {
-      setFallbackErrorMessage(err.message || 'Koneksi gagal kembali.');
+      setFallbackErrorMessage(err.message || 'Gagal memproses ulang.');
     } finally {
       setIsRetryingAi(false);
     }
   };
 
-  // Finalize Task creation and persist to Backend / Firestore without reload
+  // Finalize Task creation and persist to LocalStorage without reload
   const finalizeTaskCreation = async (
     rawInput: {
       taskName: string;
@@ -437,32 +340,24 @@ export default function App() {
       updated_at: new Date().toISOString(),
     };
 
-    // Optimistic UI update
-    setTasks((prev) => [newTask, ...prev]);
-
-    // Persist to backend/firestore
+    // Persist synchronously to LocalStorage
+    const updatedTasks = [newTask, ...tasks];
+    setTasks(updatedTasks);
     try {
-      await fetch('/api/tasks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newTask),
-      });
-    } catch (err) {
-      console.warn('Persisting task to server failed:', err);
-    }
+      localStorage.setItem('plaska_tasks', JSON.stringify(updatedTasks));
+    } catch (e) {}
   };
 
   // Toggle Subtask Completion without page reload
-  const handleToggleSubtask = async (
+  const handleToggleSubtask = (
     taskId: string,
     subtaskId: string,
     currentStatus: boolean
   ) => {
     const newStatus = !currentStatus;
 
-    // Optimistic update
-    setTasks((prevTasks) =>
-      prevTasks.map((t) => {
+    setTasks((prevTasks) => {
+      const updated = prevTasks.map((t) => {
         if (t.id !== taskId) return t;
         const updatedSubs = t.subtasks.map((st) =>
           st.id === subtaskId ? { ...st, is_completed: newStatus } : st
@@ -474,19 +369,12 @@ export default function App() {
           subtasks: updatedSubs,
           status: allCompleted ? 'COMPLETED' : anyCompleted ? 'IN_PROGRESS' : 'PENDING',
         };
-      })
-    );
-
-    // Call server
-    try {
-      await fetch(`/api/tasks/${taskId}/subtask/${subtaskId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isCompleted: newStatus }),
       });
-    } catch (err) {
-      console.warn('Subtask patch failed:', err);
-    }
+      try {
+        localStorage.setItem('plaska_tasks', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
   };
 
   // Handle Request Delete Task
@@ -496,21 +384,18 @@ export default function App() {
   };
 
   // Confirm Delete Task without reload
-  const handleConfirmDelete = async (taskId: string) => {
+  const handleConfirmDelete = (taskId: string) => {
     setIsDeleting(true);
-
-    // Optimistic update
-    setTasks((prev) => prev.filter((t) => t.id !== taskId));
-
-    try {
-      await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
-    } catch (err) {
-      console.warn('Delete task failed:', err);
-    } finally {
-      setIsDeleting(false);
-      setIsDeleteModalOpen(false);
-      setTaskToDelete(null);
-    }
+    setTasks((prev) => {
+      const updated = prev.filter((t) => t.id !== taskId);
+      try {
+        localStorage.setItem('plaska_tasks', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+    setIsDeleting(false);
+    setIsDeleteModalOpen(false);
+    setTaskToDelete(null);
   };
 
   // Start Interactive Timer for a Subtask
@@ -521,14 +406,13 @@ export default function App() {
   };
 
   // Complete Subtask from Timer and calibrate Personal Factor
-  const handleCompleteSubtaskWithTimer = async (
+  const handleCompleteSubtaskWithTimer = (
     taskId: string,
     subtaskId: string,
     actualMinutes: number
   ) => {
-    // Optimistic subtask completion
-    setTasks((prevTasks) =>
-      prevTasks.map((t) => {
+    setTasks((prevTasks) => {
+      const updated = prevTasks.map((t) => {
         if (t.id !== taskId) return t;
         const updatedSubs = t.subtasks.map((st) =>
           st.id === subtaskId
@@ -542,8 +426,12 @@ export default function App() {
           subtasks: updatedSubs,
           status: allCompleted ? 'COMPLETED' : anyCompleted ? 'IN_PROGRESS' : 'PENDING',
         };
-      })
-    );
+      });
+      try {
+        localStorage.setItem('plaska_tasks', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
 
     // Calibrate user profile Personal Factor
     const subtask = activeTimerSubtask;
@@ -559,74 +447,52 @@ export default function App() {
       personal_factor: newPF,
     };
     setUserProfile(updatedProfile);
-
     try {
-      await fetch(`/api/tasks/${taskId}/subtask/${subtaskId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isCompleted: true, actualMinutes }),
-      });
-      await fetch('/api/user/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedProfile),
-      });
-    } catch (err) {
-      console.warn('Subtask timer logging failed:', err);
-    }
+      localStorage.setItem('plaska_user_profile', JSON.stringify(updatedProfile));
+    } catch (e) {}
   };
 
   // Save updated profile from Settings or Auth modal
-  const handleSaveProfile = async (updatedFields: Partial<UserProfile>) => {
+  const handleSaveProfile = (updatedFields: Partial<UserProfile>) => {
     const merged = { ...userProfile, ...updatedFields };
     setUserProfile(merged);
     setTasks((prevTasks) => sanitizeAllTasksSchedule(prevTasks, merged));
-
     try {
-      await fetch('/api/user/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(merged),
-      });
-    } catch (err) {
-      console.warn('Saving profile failed:', err);
-    }
+      localStorage.setItem('plaska_user_profile', JSON.stringify(merged));
+    } catch (e) {}
   };
 
   // Add One-Time Event (Jadwal Dadakan)
-  const handleAddOneTimeEvent = async (event: OneTimeEvent) => {
+  const handleAddOneTimeEvent = (event: OneTimeEvent) => {
     const updatedEvents = [...(userProfile.one_time_events || []), event];
     const updatedProfile = { ...userProfile, one_time_events: updatedEvents };
     setUserProfile(updatedProfile);
     setTasks((prevTasks) => sanitizeAllTasksSchedule(prevTasks, updatedProfile));
-
     try {
-      await fetch('/api/user/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedProfile),
-      });
-    } catch (err) {
-      console.warn('Saving one-time event failed:', err);
-    }
+      localStorage.setItem('plaska_user_profile', JSON.stringify(updatedProfile));
+    } catch (e) {}
   };
 
   // Delete One-Time Event
-  const handleDeleteOneTimeEvent = async (eventId: string) => {
+  const handleDeleteOneTimeEvent = (eventId: string) => {
     const updatedEvents = (userProfile.one_time_events || []).filter((e) => e.id !== eventId);
     const updatedProfile = { ...userProfile, one_time_events: updatedEvents };
     setUserProfile(updatedProfile);
     setTasks((prevTasks) => sanitizeAllTasksSchedule(prevTasks, updatedProfile));
-
     try {
-      await fetch('/api/user/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedProfile),
-      });
-    } catch (err) {
-      console.warn('Deleting one-time event failed:', err);
-    }
+      localStorage.setItem('plaska_user_profile', JSON.stringify(updatedProfile));
+    } catch (e) {}
+  };
+
+  // Recalculate & Optimize Task Schedule on demand
+  const handleRescheduleTasks = () => {
+    setTasks((prevTasks) => {
+      const rescheduled = sanitizeAllTasksSchedule(prevTasks, userProfile);
+      try {
+        localStorage.setItem('plaska_tasks', JSON.stringify(rescheduled));
+      } catch (e) {}
+      return rescheduled;
+    });
   };
 
   return (
@@ -709,6 +575,7 @@ export default function App() {
                 onExpand={() => setExpandedCardId('timeline')}
                 onAddOneTimeEvent={handleAddOneTimeEvent}
                 onDeleteOneTimeEvent={handleDeleteOneTimeEvent}
+                onRescheduleTasks={handleRescheduleTasks}
               />
             </div>
           </div>
@@ -766,6 +633,7 @@ export default function App() {
                   onToggleSubtask={handleToggleSubtask}
                   onAddOneTimeEvent={handleAddOneTimeEvent}
                   onDeleteOneTimeEvent={handleDeleteOneTimeEvent}
+                  onRescheduleTasks={handleRescheduleTasks}
                 />
               )}
             </div>

@@ -158,18 +158,27 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
           {/* 3. Deadline */}
           <div>
             <label className="block text-xs font-bold text-slate-200 mb-1 flex items-center justify-between">
-              <span>3. Batas Waktu / Deadline (MM/DD/YYYY HH:MM) <span className="text-rose-400">*</span></span>
-              <Calendar className="w-3.5 h-3.5 text-slate-400" />
+              <span>3. Batas Waktu / Deadline <span className="text-rose-400">*</span></span>
+              <span className="flex items-center space-x-1 text-teal-300 font-semibold bg-teal-950/80 border border-teal-500/50 px-2 py-0.5 rounded-md text-[10px]">
+                <Calendar className="w-3.5 h-3.5 text-teal-300 shrink-0" />
+                <span>Pilih Waktu</span>
+              </span>
             </label>
             <input
               type="datetime-local"
               required
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
-              placeholder="MM/DD/YYYY HH:MM"
-              className="w-full text-xs sm:text-sm bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-teal-500"
+              onClick={(e) => {
+                try {
+                  e.currentTarget.showPicker();
+                } catch (err) {}
+              }}
+              className="w-full cursor-pointer text-xs sm:text-sm bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-medium focus:outline-none focus:border-teal-500 transition-colors [color-scheme:dark]"
             />
-            <p className="text-[10px] text-slate-400 mt-1">Format: Bulan/Tanggal/Tahun, Jam:Menit</p>
+            <p className="text-[10px] text-teal-400/90 mt-1 flex items-center space-x-1">
+              <span>💡 Klik kotak di atas untuk membuka pop-up kalender & jam.</span>
+            </p>
           </div>
 
           {/* 4. Detailed Description */}
