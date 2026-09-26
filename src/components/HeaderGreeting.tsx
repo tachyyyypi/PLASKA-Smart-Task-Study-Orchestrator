@@ -26,7 +26,7 @@ export const HeaderGreeting: React.FC<HeaderGreetingProps> = ({
             Halo, <span className="text-teal-400">{firstName}</span>!
           </h1>
           <p className="text-slate-400 text-sm mt-0.5">
-            Dashboard Bento Grid Plaska • Atur dan selesaikan tugas secara terstruktur.
+            Atur dan selesaikan tugas secara terstruktur.
           </p>
         </div>
 
@@ -44,7 +44,7 @@ export const HeaderGreeting: React.FC<HeaderGreetingProps> = ({
 
           <button
             onClick={onOpenAddTaskModal}
-            className="flex items-center space-x-2 px-4 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-teal-500/20 transition-all active:scale-95"
+            className="flex items-center space-x-2 px-4 py-2.5 bg-[#e58b73] hover:bg-[#d87b63] text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-[#e58b73]/25 transition-all active:scale-95"
           >
             <Plus className="w-4 h-4" />
             <span>Tambah Tugas Baru</span>

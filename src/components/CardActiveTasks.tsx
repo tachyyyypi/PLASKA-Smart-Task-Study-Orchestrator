@@ -160,15 +160,15 @@ export const CardActiveTasks: React.FC<CardActiveTasksProps> = ({
             <button
               ref={filterButtonRef}
               onClick={() => setShowFilterPopover(!showFilterPopover)}
-              className={`flex items-center space-x-1 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all ${
+              title="Filter"
+              className={`flex items-center justify-center p-2 text-xs font-semibold rounded-xl border transition-all ${
                 hasActiveFilters
                   ? 'bg-teal-600 text-slate-950 border-teal-500 font-bold'
                   : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
               }`}
             >
               <Filter className="w-3.5 h-3.5" />
-              <span>Filter</span>
-              {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-teal-300 animate-pulse" />}
+              {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-teal-300 animate-pulse ml-1" />}
             </button>
 
             {/* Popover */}
@@ -209,7 +209,7 @@ export const CardActiveTasks: React.FC<CardActiveTasksProps> = ({
 
           <button
             onClick={onOpenAddTaskModal}
-            className="flex items-center space-x-1.5 px-3 py-1.5 bg-teal-400 hover:bg-teal-300 text-slate-950 font-bold text-xs rounded-xl shadow-md shadow-teal-400/20 transition-all active:scale-95"
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-[#e58b73] hover:bg-[#d87b63] text-slate-950 font-bold text-xs rounded-xl shadow-md shadow-[#e58b73]/25 transition-all active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Tambah Tugas</span>
@@ -226,7 +226,7 @@ export const CardActiveTasks: React.FC<CardActiveTasksProps> = ({
             <p className="text-xs text-slate-500 mt-1 mb-4">Tambahkan tugas sekolah untuk memulai orkestrasi AI Plaska</p>
             <button
               onClick={onOpenAddTaskModal}
-              className="px-4 py-2 bg-teal-400 hover:bg-teal-300 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all"
+              className="px-4 py-2 bg-[#e58b73] hover:bg-[#d87b63] text-slate-950 font-bold text-xs rounded-xl shadow-md shadow-[#e58b73]/25 transition-all active:scale-95"
             >
               + Tambah Tugas Sekarang
             </button>

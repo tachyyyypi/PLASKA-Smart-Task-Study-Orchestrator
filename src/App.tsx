@@ -826,6 +826,7 @@ export default function App() {
 
       {/* INTERACTIVE WORK-SESSION TIMER MODAL */}
       <InteractiveTimerModal
+        key={activeTimerSubtask?.id || 'timer-modal'}
         isOpen={isTimerModalOpen}
         task={activeTimerTask}
         subtask={activeTimerSubtask}

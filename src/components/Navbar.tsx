@@ -45,8 +45,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
-          <div className="w-9 h-9 rounded-xl overflow-hidden bg-teal-500/15 border border-teal-500/30 flex items-center justify-center text-teal-400 shadow-sm">
-            <img src={`${import.meta.env.BASE_URL}logo-task-planner.svg`} alt="Plaska Logo" className="w-full h-full object-cover" />
+          <div className="w-9 h-9 flex items-center justify-center bg-transparent">
+            <img src={`${import.meta.env.BASE_URL}logo-task-planner.svg`} alt="Plaska Logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
@@ -119,14 +119,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>Pengaturan Waktu & Rutinitas</span>
           </button>
 
-          <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between px-2">
-            <span className="text-[11px] text-slate-400">
-              Database: <strong className="text-white">{backendStatus?.mode === 'firebase' ? 'Firestore' : 'Local'}</strong>
-            </span>
-            <span className="text-[11px] text-slate-400">
-              AI: <strong className="text-teal-400">{geminiKeyPresent ? 'Aktif' : 'Missing'}</strong>
-            </span>
-          </div>
+
         </div>
       )}
     </header>

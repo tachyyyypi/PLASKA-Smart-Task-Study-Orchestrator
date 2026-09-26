@@ -112,7 +112,7 @@ export const TimeSettingsModal: React.FC<TimeSettingsModalProps> = ({
         </button>
 
         <div className="flex items-center space-x-3 mb-4 shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+          <div className="w-10 h-10 rounded-xl bg-teal-500/15 border border-teal-500/30 flex items-center justify-center text-teal-400">
             <Clock className="w-5 h-5" />
           </div>
           <div>
@@ -139,7 +139,7 @@ export const TimeSettingsModal: React.FC<TimeSettingsModalProps> = ({
                   type="time"
                   value={sleepStart}
                   onChange={(e) => setSleepStart(e.target.value)}
-                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-teal-500"
                 />
               </div>
               <div>
@@ -148,7 +148,7 @@ export const TimeSettingsModal: React.FC<TimeSettingsModalProps> = ({
                   type="time"
                   value={sleepEnd}
                   onChange={(e) => setSleepEnd(e.target.value)}
-                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-teal-500"
                 />
               </div>
             </div>
@@ -167,7 +167,7 @@ export const TimeSettingsModal: React.FC<TimeSettingsModalProps> = ({
                   type="time"
                   value={schoolStart}
                   onChange={(e) => setSchoolStart(e.target.value)}
-                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-teal-500"
                 />
               </div>
               <div>
@@ -176,7 +176,7 @@ export const TimeSettingsModal: React.FC<TimeSettingsModalProps> = ({
                   type="time"
                   value={schoolEnd}
                   onChange={(e) => setSchoolEnd(e.target.value)}
-                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-teal-500"
                 />
               </div>
             </div>
@@ -395,7 +395,7 @@ export const TimeSettingsModal: React.FC<TimeSettingsModalProps> = ({
                   max="45"
                   value={breakMin}
                   onChange={(e) => setBreakMin(Number(e.target.value))}
-                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-teal-500"
                 />
               </div>
               <div>
@@ -406,7 +406,7 @@ export const TimeSettingsModal: React.FC<TimeSettingsModalProps> = ({
                   max="180"
                   value={maxSessionMin}
                   onChange={(e) => setMaxSessionMin(Number(e.target.value))}
-                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-teal-500"
                 />
               </div>
             </div>

@@ -26,9 +26,33 @@ export const InteractiveTimerModal: React.FC<InteractiveTimerModalProps> = ({
   );
   const [isMinimized, setIsMinimized] = useState(false);
   const timerRef = useRef<any>(null);
+  const activeSubtaskIdRef = useRef<string | null>(null);
+
+  // Reset timer state whenever a new or different subtask is selected / modal opens
+  useEffect(() => {
+    if (isOpen && subtask?.id) {
+      if (activeSubtaskIdRef.current !== subtask.id) {
+        // Stop any running interval from previous subtask
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+        }
+        // Always reset timer to 0 (0:00) for new subtask
+        setSecondsElapsed(0);
+        setIsActive(true);
+        setManualMinutes(subtask.personalized_minutes || subtask.estimated_minutes || 30);
+        setIsMinimized(false);
+        activeSubtaskIdRef.current = subtask.id;
+      }
+    } else if (!isOpen) {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      activeSubtaskIdRef.current = null;
+    }
+  }, [isOpen, subtask?.id, subtask?.personalized_minutes, subtask?.estimated_minutes]);
 
   useEffect(() => {
-    if (isActive) {
+    if (isOpen && isActive) {
       timerRef.current = setInterval(() => {
         setSecondsElapsed((prev) => prev + 1);
       }, 1000);
@@ -38,7 +62,7 @@ export const InteractiveTimerModal: React.FC<InteractiveTimerModalProps> = ({
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isActive]);
+  }, [isOpen, isActive]);
 
   if (!isOpen || !task || !subtask) return null;
 

@@ -73,7 +73,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-800">
           <div className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+            <div className="w-9 h-9 rounded-xl bg-teal-500/15 border border-teal-500/30 flex items-center justify-center text-teal-400">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
@@ -107,7 +107,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
               value={taskName}
               onChange={(e) => setTaskName(e.target.value)}
               placeholder="Contoh: Makalah Perubahan Iklim & Krisis Pangan"
-              className="w-full text-xs sm:text-sm bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full text-xs sm:text-sm bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:border-teal-500 transition-colors"
             />
           </div>
 
@@ -125,7 +125,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                   onClick={() => setSubject(sub)}
                   className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all ${
                     subject === sub
-                      ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm shadow-indigo-600/30'
+                      ? 'bg-teal-600 text-slate-950 border-teal-500 font-bold shadow-sm shadow-teal-600/30'
                       : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
                   }`}
                 >
@@ -137,7 +137,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                 onClick={() => setSubject('Lainnya')}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all ${
                   subject === 'Lainnya'
-                    ? 'bg-indigo-600 text-white border-indigo-500'
+                    ? 'bg-teal-600 text-slate-950 border-teal-500 font-bold'
                     : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
                 }`}
               >
@@ -150,7 +150,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                 value={customSubject}
                 onChange={(e) => setCustomSubject(e.target.value)}
                 placeholder="Tuliskan nama mata pelajaran..."
-                className="w-full text-xs bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+                className="w-full text-xs bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-teal-500"
               />
             )}
           </div>
@@ -158,7 +158,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
           {/* 3. Deadline */}
           <div>
             <label className="block text-xs font-bold text-slate-200 mb-1 flex items-center justify-between">
-              <span>3. Batas Waktu / Deadline (TT/BB/AAAA HH:MM) <span className="text-rose-400">*</span></span>
+              <span>3. Batas Waktu / Deadline (MM/DD/YYYY HH:MM) <span className="text-rose-400">*</span></span>
               <Calendar className="w-3.5 h-3.5 text-slate-400" />
             </label>
             <input
@@ -166,17 +166,17 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
               required
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
-              placeholder="TT/BB/AAAA HH:MM"
-              className="w-full text-xs sm:text-sm bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500"
+              placeholder="MM/DD/YYYY HH:MM"
+              className="w-full text-xs sm:text-sm bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-teal-500"
             />
-            <p className="text-[10px] text-slate-400 mt-1">Format Standar Indonesia: DD/MM/YYYY HH:MM</p>
+            <p className="text-[10px] text-slate-400 mt-1">Format: Bulan/Tanggal/Tahun, Jam:Menit</p>
           </div>
 
           {/* 4. Detailed Description */}
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="text-xs font-bold text-slate-200">
-                4. Deskripsi & Instruksi Lengkap dari Guru
+                4. Deskripsi Tugas / Instruksi Guru
               </label>
               <button
                 type="button"
@@ -187,7 +187,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                 <span>ℹ️ Panduan & Contoh</span>
               </button>
             </div>
-            <p className="text-[11px] text-indigo-300 mb-1.5 font-medium">
+            <p className="text-[11px] text-teal-300 mb-1.5 font-medium">
               Semakin mendetail deskripsi yang diberikan, semakin akurat AI dalam menyusun subtugas.
             </p>
             <textarea
@@ -195,7 +195,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Contoh: Buat makalah minimal 5 halaman mengenai dampak perubahan iklim. Gunakan sumber terpercaya dan sertakan data grafik BMKG..."
-              className="w-full text-xs sm:text-sm bg-slate-950 border border-slate-700 rounded-xl p-3 text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors leading-relaxed"
+              className="w-full text-xs sm:text-sm bg-slate-950 border border-slate-700 rounded-xl p-3 text-white placeholder-slate-400 focus:outline-none focus:border-teal-500 transition-colors leading-relaxed"
             />
           </div>
 
@@ -210,7 +210,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
               value={reference}
               onChange={(e) => setReference(e.target.value)}
               placeholder="Contoh: Format APA Style, margin 4-4-3-3, font Times New Roman 12pt"
-              className="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+              className="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:border-teal-500"
             />
           </div>
 
@@ -219,16 +219,16 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
             <button
               type="submit"
               disabled={isLoading || !taskName.trim()}
-              className="w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-600/30 flex items-center justify-center space-x-2 transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold text-slate-950 bg-teal-500 hover:bg-teal-400 shadow-lg shadow-teal-500/25 flex items-center justify-center space-x-2 transition-all active:scale-[0.98] disabled:opacity-50"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
                   <span>Sedang Menghubungi Gemini AI Orchestrator...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4" />
+                  <Sparkles className="w-4 h-4 text-slate-950" />
                   <span>Dekomposisi & Jadwalkan dengan AI</span>
                 </>
               )}

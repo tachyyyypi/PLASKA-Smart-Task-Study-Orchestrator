@@ -504,7 +504,8 @@ export const CardTimeline: React.FC<CardTimelineProps> = ({
               </div>
             </div>
             <div className="text-[11px] text-slate-500">
-              Arahkan kursor ke blok untuk detail alokasi waktu
+              <span className="lg:hidden">Pencet blok untuk detail alokasi waktu</span>
+              <span className="hidden lg:inline">Arahkan kursor ke blok untuk detail alokasi waktu</span>
             </div>
           </div>
         </div>
