@@ -156,10 +156,10 @@ export const CardTimeline: React.FC<CardTimelineProps> = ({
     return b.type === 'TASK' && b.startMinute > nowMinute && info.isCompleted;
   }).length;
 
-  const showBanner = !dismissRescheduleBanner && (overdueCount >= 2 || earlyCount >= 2);
-  const bannerReason = overdueCount >= 2
-    ? `Anda memiliki ${overdueCount} tugas yang terlewat dari jadwal seharusnya. Klik atur ulang untuk merapatkan waktu.`
-    : `Anda menyelesaikan ${earlyCount} tugas lebih awal! Timeline dapat dioptimasi kembali.`;
+  // Active banner condition when tasks are overdue or completed early
+  const showBanner = !dismissRescheduleBanner && (overdueCount >= 1 || earlyCount >= 1);
+  const bannerReason =
+    'Jadwal kamu tampaknya butuh penyesuaian nih (ada tugas yang bertabrakan atau terlewat). Klik untuk merapikan alokasi waktu secara otomatis.';
 
   const handleRescheduleAction = () => {
     setIsReschedulingLocal(true);

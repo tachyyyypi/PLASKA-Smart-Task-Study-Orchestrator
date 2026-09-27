@@ -2,13 +2,13 @@ import { GoogleGenAI, Type } from '@google/genai';
 import { DecompositionResult } from '../types';
 import { runLocalDecomposition } from './localDecomposition';
 
-// Get Gemini API Key from client environment variables
 export function getGeminiApiKey(): string {
-  return (
+  const apiKey =
     (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_GEMINI_API_KEY) ||
     (typeof process !== 'undefined' && process.env && process.env.GEMINI_API_KEY) ||
-    ''
-  );
+    '';
+
+  return apiKey;
 }
 
 export async function decomposeTaskWithGemini(input: {
@@ -20,9 +20,11 @@ export async function decomposeTaskWithGemini(input: {
 }): Promise<DecompositionResult> {
   const apiKey = getGeminiApiKey();
 
-  // If no API key is provided, gracefully use intelligent local client decomposition
   if (!apiKey) {
-    console.warn('VITE_GEMINI_API_KEY tidak ditemukan. Menggunakan Local Client Decomposition.');
+    console.warn(
+      '⚠️ [PLASKA AI Warning]: VITE_GEMINI_API_KEY tidak ditemukan pada environment variables.\n' +
+      'Sistem secara otomatis berjalan menggunakan fallback "runLocalDecomposition" (Client-Side Decomposition).'
+    );
     return runLocalDecomposition(
       input.taskName,
       input.subject,
@@ -34,7 +36,6 @@ export async function decomposeTaskWithGemini(input: {
   try {
     const ai = new GoogleGenAI({ apiKey });
 
-    // Model selection as per guidelines: 'gemini-3.8-flash'
     const model = 'gemini-3.8-flash';
 
     const prompt = `Anda adalah Asisten Penjadwalan Belajar Cerdas (PLASKA AI).
